@@ -62,6 +62,19 @@ class CheckerTest(unittest.TestCase):
             f.unlink()
         self.assertIn("silver: demo/data/ has no recorded demo data", self.problems())
 
+    def test_R007_explainer_must_not_load_from_network(self):
+        page = self.repo / "explainers" / "index.html"
+        ok = page.read_text() + '<a href="https://example.com">a plain link is fine</a>'
+        page.write_text(ok)
+        self.assertEqual(self.problems(), [])
+        for bad in ('<script src="https://cdn.example/x.js"></script>',
+                    '<link rel="stylesheet" href="//fonts.example/css">',
+                    '<style>@import "https://fonts.example/a.css";</style>'):
+            with self.subTest(bad=bad):
+                page.write_text(ok + bad)
+                self.assertIn("silver: explainers/index.html loads something from the network", self.problems())
+                self.assertEqual(self.problems("bronze"), [])
+
     def test_R009_checker_imports_only_stdlib(self):
         src = (ROOT / "tools" / "prax_check.py").read_text()
         imports = {l.split()[1].split(".")[0] for l in src.splitlines()
@@ -70,7 +83,7 @@ class CheckerTest(unittest.TestCase):
 
     def test_R010_templates_exist(self):
         names = {str(p.relative_to(ROOT / "templates")) for p in (ROOT / "templates").rglob("*")}
-        self.assertLessEqual(set(BRONZE) | {"DEMO.md", "EXPLAINER_GUIDE.md"}, names)
+        self.assertLessEqual(set(BRONZE) | {"demo/DEMO.md", "EXPLAINER_GUIDE.md"}, names)
 
     def test_R011_placeholders_reported(self):
         (self.repo / "blueprint" / "GOAL.md").write_text((ROOT / "templates" / "blueprint" / "GOAL.md").read_text())

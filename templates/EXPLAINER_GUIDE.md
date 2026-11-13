@@ -16,3 +16,18 @@ One file: `explainers/index.html`. Self-contained (inline CSS/JS/SVG, no CDN, no
 - Each scene has a heading and a 1–3 sentence caption a non-engineer understands.
 - Keyboard: space = play/pause, arrows = step.
 - Publish it as an artifact and put the link in README and `prax.yaml`.
+- Load nothing from the network (no CDN script, web font or remote image); the Silver check fails
+  otherwise. Plain links out are fine.
+
+# The README diagram: `explainers/readme-flow.svg`
+One animated SVG shown at the top of the README (`<img src="explainers/readme-flow.svg" width="100%">`).
+GitHub strips scripts from SVG, so animate with CSS keyframes or SMIL only. Show the parts as boxes
+and one request or record moving through them, with a one-line caption per step. Keep it under
+~20 KB and readable on a dark and a light page (draw your own background).
+
+# The short video (optional)
+For readers who will not click through the explainer. About a minute, silent, 1920×1080, one
+caption per scene, built from **real** screenshots and **real** numbers from `demo/data/` (never
+mock-ups). Keep the source next to it, e.g. a Remotion project in `explainers/video/`, so the video
+can be re-rendered when the system changes, and do not commit `node_modules/`. Link the MP4 from
+the README and from `prax.yaml` (`explainer.video`). Aim for under ~5 MB.

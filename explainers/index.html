@@ -82,7 +82,7 @@ footer{color:var(--muted);font-size:.85rem}
 <div class="wrap">
 
 <header>
-  <span class="eyebrow">Prax family · method v0.1 · 2026-10-30</span>
+  <span class="eyebrow">Prax family · method v0.3 · 2026-11-13</span>
   <h1>Prax Systems</h1>
   <p class="thesis">A way to build systems where <b>the specification is the system</b> and the code is <i>one rendering</i> of it, so a future model can rebuild it in any language.</p>
   <nav aria-label="Sheets">
@@ -238,7 +238,8 @@ footer{color:var(--muted);font-size:.85rem}
   "The learning project splits into four repos, each clonable and runnable alone.",
   "K-agent-headers@1: every client says who is calling with X-Agent-User (plus X-Agent-Dept, X-Session-Id). Owned by llm-proxy-log.",
   "K-log-schema@1 and @2: the SQLite log the proxies write and the console reads. @2 adds the firewall tables signals and admin_actions.",
-  "Each contract has one owner. Consumers cite it by version and test against the owner’s demo database, so a breaking change fails the build instead of the demo."]'>
+  "Each contract has one owner. Consumers cite it by version and test against the owner’s demo database, so a breaking change fails the build instead of the demo.",
+  "All four pass Silver today: 34, 58, 31 and 33 requirements, every one proven by a test or a demo step (checked 13 November 2026)."]'>
   <div class="sheet-head"><h2>Four systems, joined only by contracts</h2><span class="eyebrow">Sheet 6 · ecosystem</span></div>
   <div class="drawing dim"><svg viewBox="0 0 720 260" role="img" aria-label="Four repos connected by versioned contracts">
     <g data-step="0">
@@ -261,6 +262,12 @@ footer{color:var(--muted);font-size:.85rem}
       <text x="360" y="129" text-anchor="middle" class="m" style="fill:var(--ok)">one owner each</text>
       <text x="360" y="146" text-anchor="middle" class="m" style="fill:var(--ok)">cited by version</text>
     </g>
+    <g data-step="4" class="m" style="font-weight:600">
+      <text x="185" y="176" text-anchor="end" style="fill:var(--ok)">✓ silver · 31/31</text>
+      <text x="445" y="18" text-anchor="end" style="fill:var(--ok)">✓ silver · 34/34</text>
+      <text x="445" y="256" text-anchor="end" style="fill:var(--ok)">✓ silver · 58/58</text>
+      <text x="705" y="176" text-anchor="end" style="fill:var(--ok)">✓ silver · 33/33</text>
+    </g>
   </svg></div>
   <p class="caption" aria-live="polite"></p>
   <div class="controls"><button data-act="play">▶ Play</button><button data-act="prev" aria-label="Previous step">←</button><button data-act="next" aria-label="Next step">→</button><span class="stepno"></span></div>
@@ -270,29 +277,29 @@ footer{color:var(--muted);font-size:.85rem}
 <section id="replicate">
   <div class="sheet-head"><h2>Use it on your own system</h2><span class="eyebrow">Sheet 7 · replicate</span></div>
   <p>Copy the templates into a new folder, fill them in the order of the workflow, and let the checker tell you what is missing.</p>
-<pre>git clone https://github.com/&lt;owner&gt;/prax-systems
-mkdir my-system &amp;&amp; cp -r prax-systems/templates/* my-system/
+<pre>git clone https://github.com/claudiucalomfirescu/prax-systems
+cp -r prax-systems/templates my-system
 mkdir -p my-system/tools &amp;&amp; cp prax-systems/tools/prax_check.py my-system/tools/
 cd my-system
 python3 tools/prax_check.py . --level silver   # lists every gap until it passes</pre>
   <ol class="rule" aria-label="The eight rules">
-    <li><span>R1</span>No code without spec: new behaviour means a new or changed R-id.</li>
-    <li><span>R2</span>No R-id without proof: a test cites it, or its SPEC row names a manual demo step.</li>
-    <li><span>R3</span>No repo without rebuild prompts: P-01…, P-REBUILD and P-VERIFY.</li>
-    <li><span>R4</span>Clone and see: recorded demo data, one command, no secrets.</li>
-    <li><span>R5</span>Publish the blueprint, not just the code: GOAL, SPEC, ARCHITECTURE, PROMPTS, DECISIONS and ROADMAP in <code>blueprint/</code>, called out at the top of the README.</li>
-    <li><span>R6</span>Secrets stay out: keys in env vars, demo data scrubbed, explainer offline.</li>
-    <li><span>R7</span>Decisions are written down the day they are made, autonomous ones included.</li>
-    <li><span>R8</span>Contracts are versioned: breaking one means a new version id.</li>
+    <li><span>R1</span><div>No code without spec: new behaviour means a new or changed R-id.</div></li>
+    <li><span>R2</span><div>No R-id without proof: a test cites it, or its SPEC row names a manual demo step.</div></li>
+    <li><span>R3</span><div>No repo without rebuild prompts: P-01…, P-REBUILD and P-VERIFY.</div></li>
+    <li><span>R4</span><div>Clone and see: recorded demo data, one command, no secrets.</div></li>
+    <li><span>R5</span><div>Publish the blueprint, not just the code: GOAL, SPEC, ARCHITECTURE, PROMPTS, DECISIONS and ROADMAP in <code>blueprint/</code>, called out at the top of the README.</div></li>
+    <li><span>R6</span><div>Secrets stay out: keys in env vars, demo data scrubbed, explainer offline.</div></li>
+    <li><span>R7</span><div>Decisions are written down the day they are made, autonomous ones included.</div></li>
+    <li><span>R8</span><div>Contracts are versioned: breaking one means a new version id.</div></li>
   </ol>
   <div class="levels">
     <div class="level"><span class="eyebrow">Level</span><strong>Bronze</strong><p>Every required file exists and is filled in; README has a quickstart.</p></div>
-    <div class="level"><span class="eyebrow">Level · first release</span><strong>Silver</strong><p>Bronze, plus every R-id proven, recorded demo data and an explainer.</p></div>
-    <div class="level"><span class="eyebrow">Level</span><strong>Gold</strong><p>Silver, plus one rebuild from P-REBUILD by another model or language that passed P-VERIFY.</p></div>
+    <div class="level"><span class="eyebrow">Level · first release</span><strong>Silver</strong><p>Bronze, plus every R-id proven, recorded demo data and an offline explainer. All four systems are here.</p></div>
+    <div class="level"><span class="eyebrow">Level</span><strong>Gold</strong><p>Silver, plus one rebuild from P-REBUILD by another model or language that passed P-VERIFY. None yet: it is next on the roadmap.</p></div>
   </div>
 </section>
 
-<footer>Prax Systems v0.1. Source: <code>repos/prax-systems</code> on branch <code>split</code>. Keyboard: space plays or pauses the sheet in view, ← → step.</footer>
+<footer>Prax Systems method v0.3. Source: <code>github.com/claudiucalomfirescu/prax-systems</code>. Keyboard: space plays or pauses the sheet in view, ← → step.</footer>
 </div>
 
 <script>

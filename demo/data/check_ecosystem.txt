@@ -1,0 +1,13 @@
+# Recorded 2026-11-13 by demo/check_ecosystem.sh against the main branch of each published repo.
+llm-proxy-log: PASS (silver)
+  · 34 requirements in SPEC.md
+  · 34/34 requirements covered
+llm-proxy-firewall: PASS (silver)
+  · 58 requirements in SPEC.md
+  · 58/58 requirements covered
+vxc-motors-sim: PASS (silver)
+  · 31 requirements in SPEC.md
+  · 31/31 requirements covered
+llm-session-console: PASS (silver)
+  · 33 requirements in SPEC.md
+  · 33/33 requirements covered

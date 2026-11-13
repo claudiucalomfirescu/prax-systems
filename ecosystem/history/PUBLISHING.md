@@ -1,9 +1,12 @@
 # Publishing the five repos
 
+> **Historical snapshot**, kept for the record: how the five folders were published as standalone repos on 2026-11-01. Numbers and statuses below are as of that date.
+> For the current state of the ecosystem see [ecosystem/README.md](../README.md).
+
 Everything lives in `repos/<name>/` on branch `split` of `agent-session-inspector` until you create
 the GitHub repositories. Each folder becomes its own repository **with its own history** (only the
 commits that touched that folder), using `git subtree split`. The script
-[`tools/publish.sh`](tools/publish.sh) does it in one command per repo and also:
+[`tools/publish.sh`](https://github.com/claudiucalomfirescu/agent-session-inspector/blob/main/repos/tools/publish.sh) does it in one command per repo and also:
 
 - rewrites links that point at sibling folders (`../prax-systems/…`, `../MASTER_PLAN.md`) to the
   published GitHub URLs;

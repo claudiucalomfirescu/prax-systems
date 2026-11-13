@@ -15,51 +15,43 @@ from pathlib import Path
 
 # The blueprint: everything a future model needs to rebuild the repo. It lives in its own
 # folder so the repo root stays the front door (README, manifest, code).
-BLUEPRINT_DIR = "blueprint"
+BLUEPRINT = "blueprint"
 BLUEPRINT_FILES = ["GOAL.md", "SPEC.md", "ARCHITECTURE.md", "PROMPTS.md", "ROADMAP.md", "DECISIONS.md"]
-REQUIRED_FILES = ["prax.yaml", "README.md"] + [f"{BLUEPRINT_DIR}/{f}" for f in BLUEPRINT_FILES]
+REQUIRED_FILES = ["prax.yaml", "README.md"] + [f"{BLUEPRINT}/{f}" for f in BLUEPRINT_FILES]
 SILVER_PATHS = ["demo/DEMO.md", "explainers/index.html", "tests"]
 MANIFEST_KEYS = ["prax", "name", "kind", "one_liner", "status", "run", "docs", "explainer"]
 R_ID = re.compile(r"\bR-(\d{3})\b")
-# Tests may cite R-004 or test_R004_...
-TEST_ID = re.compile(r"(?<![A-Za-z])R-?(\d{3})(?!\d)")
+TEST_ID = re.compile(r"(?<![A-Za-z])R-?(\d{3})(?!\d)")  # tests may cite R-004 or test_R004_...
 PLACEHOLDER = re.compile(r"<name>|<one-liner|R-001 \| The <component>")
+# An explainer must open offline from file://, so it may not load anything from the network.
+EXTERNAL_LOAD = re.compile(r"<(?:script|link|img|iframe|video|audio|source)\b[^>]*\b(?:src|href)=[\"']?(?:https?:)?//"
+                           r"|url\([\"']?(?:https?:)?//|@import", re.I)
 TEXT_SUFFIXES = {".py", ".js", ".ts", ".go", ".rs", ".java", ".sh", ".md", ".html", ".txt", ".yaml", ".yml", ".json"}
 
 
-def spec_requirements(spec_text):
-    """R-ids defined in SPEC.md: those that start a table row or a heading/bullet."""
-    ids = set()
+def read(path):
+    return path.read_text(errors="ignore")
+
+
+def spec_ids(spec_text):
+    """(defined, manual): R-ids that start a table row, heading or bullet in SPEC.md, and the
+    subset whose row says the check is manual."""
+    defined, manual = set(), set()
     for line in spec_text.splitlines():
         s = line.strip()
-        if s.startswith(("|", "#", "-", "*")):
-            m = R_ID.search(s[:20])
-            if m:
-                ids.add(m.group(1))
-    return ids
-
-
-def manual_requirements(spec_text):
-    """R-ids whose spec row says the check is manual."""
-    ids = set()
-    for line in spec_text.splitlines():
-        if "manual" in line.lower():
-            m = R_ID.search(line.strip()[:20])
-            if m:
-                ids.add(m.group(1))
-    return ids
+        m = R_ID.search(s[:20])
+        if m and s.startswith(("|", "#", "-", "*")):
+            defined.add(m.group(1))
+            if "manual" in s.lower():
+                manual.add(m.group(1))
+    return defined, manual
 
 
 def cited_in_tests(tests_dir):
     ids = set()
-    if not tests_dir.is_dir():
-        return ids
-    for p in tests_dir.rglob("*"):
+    for p in tests_dir.rglob("*") if tests_dir.is_dir() else ():
         if p.is_file() and p.suffix in TEXT_SUFFIXES:
-            try:
-                ids |= set(TEST_ID.findall(p.read_text(errors="ignore")))
-            except OSError:
-                pass
+            ids |= set(TEST_ID.findall(read(p)))
     return ids
 
 
@@ -71,56 +63,50 @@ def check(repo, level):
             problems.append(f"missing {f}")
         elif p.stat().st_size < 120 and f != "prax.yaml":
             problems.append(f"{f} is nearly empty")
-        elif PLACEHOLDER.search(p.read_text(errors="ignore")):
+        elif PLACEHOLDER.search(read(p)):
             problems.append(f"{f} still contains template placeholders")
     for f in BLUEPRINT_FILES:
         if (repo / f).is_file():
-            problems.append(f"{f} is in the repo root; move it to {BLUEPRINT_DIR}/")
+            problems.append(f"{f} is in the repo root; move it to {BLUEPRINT}/")
 
-    manifest = repo / "prax.yaml"
-    if manifest.is_file():
-        text = manifest.read_text(errors="ignore")
-        for key in MANIFEST_KEYS:
-            if not re.search(rf"^{key}:", text, re.M):
-                problems.append(f"prax.yaml has no '{key}'")
+    if (repo / "prax.yaml").is_file():
+        text = read(repo / "prax.yaml")
+        problems += [f"prax.yaml has no '{k}'" for k in MANIFEST_KEYS if not re.search(rf"^{k}:", text, re.M)]
 
-    prompts = repo / BLUEPRINT_DIR / "PROMPTS.md"
+    prompts = repo / BLUEPRINT / "PROMPTS.md"
     if prompts.is_file():
-        t = prompts.read_text(errors="ignore")
-        for p in ("P-REBUILD", "P-VERIFY"):
-            if p not in t:
-                problems.append(f"PROMPTS.md has no {p}")
+        t = read(prompts)
+        problems += [f"PROMPTS.md has no {p}" for p in ("P-REBUILD", "P-VERIFY") if p not in t]
         if not re.search(r"P-0?1\b", t):
             problems.append("PROMPTS.md has no step-by-step prompts (P-01…)")
 
-    spec = repo / BLUEPRINT_DIR / "SPEC.md"
-    reqs = set()
+    spec = repo / BLUEPRINT / "SPEC.md"
+    reqs, manual = spec_ids(read(spec)) if spec.is_file() else (set(), set())
     if spec.is_file():
-        st = spec.read_text(errors="ignore")
-        reqs = spec_requirements(st)
         if not reqs:
             problems.append("SPEC.md defines no requirements (R-001…)")
-        if not re.search(r"\bK-[\w-]+@\d", st):
+        if not re.search(r"\bK-[\w-]+@\d", read(spec)):
             notes.append("SPEC.md names no versioned contract (K-…@n)")
         notes.append(f"{len(reqs)} requirements in SPEC.md")
 
     readme = repo / "README.md"
     if readme.is_file():
-        rt = readme.read_text(errors="ignore")
+        rt = read(readme)
         if "```" not in rt:
             problems.append("README.md has no quickstart commands")
-        if f"{BLUEPRINT_DIR}/" not in rt:
-            problems.append(f"README.md does not point readers to {BLUEPRINT_DIR}/")
+        if f"{BLUEPRINT}/" not in rt:
+            problems.append(f"README.md does not point readers to {BLUEPRINT}/")
 
     if level == "silver":
-        for p in SILVER_PATHS:
-            if not (repo / p).exists():
-                problems.append(f"silver: missing {p}")
+        problems += [f"silver: missing {p}" for p in SILVER_PATHS if not (repo / p).exists()]
         data = repo / "demo" / "data"
         if not data.is_dir() or not any(data.iterdir()):
             problems.append("silver: demo/data/ has no recorded demo data")
+        explainer = repo / "explainers" / "index.html"
+        if explainer.is_file() and EXTERNAL_LOAD.search(read(explainer)):
+            problems.append("silver: explainers/index.html loads something from the network")
         if reqs:
-            covered = cited_in_tests(repo / "tests") | manual_requirements(spec.read_text(errors="ignore"))
+            covered = cited_in_tests(repo / "tests") | manual
             missing = sorted(reqs - covered)
             if missing:
                 problems.append("silver: requirements with no test or manual check: "

@@ -1,5 +1,8 @@
 # Morning report · 31 October 2026
 
+> **Historical snapshot**, kept for the record: the status report of 2026-10-31, before the repos were published. Numbers and statuses below are as of that date.
+> For the current state of the ecosystem see [ecosystem/README.md](../README.md).
+
 The project has been split into five repositories. Each one passes the Prax Systems **Silver** check
 (spec with numbered requirements, every requirement proven by a test or a demo step, rebuild prompts,
 recorded demo data, an animated explainer). Its offline tests pass too. Everything is on branch
@@ -28,7 +31,7 @@ brings `split` into `main`.
 
 Checked at 01:45 UTC on `split` (`f68ae9b`) with `python3 tools/prax_check.py . --level silver` and
 `python3 -m unittest discover -s tests` in each folder, after `pip install -r requirements.txt`.
-The repos share contracts defined once in [CONTRACTS.md](CONTRACTS.md): the `X-Agent-User` headers,
+The repos share contracts defined once in [CONTRACTS.md](../CONTRACTS.md): the `X-Agent-User` headers,
 and log schema @1 (proxy-log) and @2 (proxy-firewall). The console's tests load both proxies' demo
 databases, so a breaking schema change fails its build.
 
@@ -75,7 +78,7 @@ the ones the threads made on their own:
 | Repo | Decision | Why it matters |
 |---|---|---|
 | prax-systems | Six-layer model; requirements as R-ids cited by tests; P-REBUILD + P-VERIFY; Bronze/Silver/Gold with a checker | This is the method itself ([DECISIONS](https://github.com/claudiucalomfirescu/prax-systems/blob/main/blueprint/DECISIONS.md) D-003…D-007) |
-| all | Log schema adds `user` and `dept` columns, with a hashed-key fallback for unnamed callers | Every repo depends on it ([CONTRACTS](CONTRACTS.md)) |
+| all | Log schema adds `user` and `dept` columns, with a hashed-key fallback for unnamed callers | Every repo depends on it ([CONTRACTS](../CONTRACTS.md)) |
 | llm-proxy-log | D-006 token counts copied into their own columns; D-009 an offline fake LLM; D-011 demo sessions re-dated across a week | Makes charts plain SQL, tests offline, and the week view meaningful |
 | llm-proxy-firewall | D-105 a generic Brightleaf policy (dealership topics stay in vxc); D-107 grounding optional; D-110 harassment capped at warning when only the LLM flags it | Changes what gets blocked |
 | vxc-motors-sim | D-005 mail/chat as a "doorbell" plus read-by-tool; D-008 one judgment tool (BMW tech case); D-011 vendored firewall proxy; D-015 folders renamed `apps/`, `agents/`, `sim/` | Shapes how the company behaves |

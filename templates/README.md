@@ -2,9 +2,7 @@
 
 > <one-liner from prax.yaml>
 
-![explainer](explainers/preview.png) <!-- optional still; the real thing is explainers/index.html -->
-
-**Animated explainer:** [explainers/index.html](explainers/index.html) · [published](<artifact link>)
+<p align="center"><img src="explainers/readme-flow.svg" alt="Animated diagram of how <name> works" width="100%"></p>
 
 > [!IMPORTANT]
 > **This repo publishes the blueprint, not just the code.** Most projects share only their code.
@@ -15,8 +13,14 @@
 > or another) and prove the result with the same tests and recorded demo data.
 > [How to rebuild it ↓](#rebuild-it-from-the-blueprint)
 
+## The problem it solves
+One paragraph: the world without this system, in words a stranger understands.
+
 ## What it is
-Two or three sentences. What problem goes away when you run this.
+Two or three sentences, then the screenshots that matter.
+
+**Animated explainer:** [explainers/index.html](explainers/index.html) · [published](<artifact link>) ·
+**Video (≈60 s, optional):** [explainers/<name>-explainer.mp4](explainers/<name>-explainer.mp4)
 
 ## 60-second quickstart (no API key)
 ```bash

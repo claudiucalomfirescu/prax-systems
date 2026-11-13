@@ -28,6 +28,7 @@ docs:
 explainer:
   file: explainers/index.html
   published: ""          # claude.ai artifact link
+  video: ""              # optional: explainers/<name>-explainer.mp4 (source in explainers/video/)
 built_with:
   model: ""              # model family that wrote this rendering
   date: ""

@@ -1,6 +1,7 @@
 # The Prax Systems method
 
-Version 0.1 · 2026-10-30
+Version 0.3 · 2026-11-13 (0.1: 2026-10-30; 0.2 moved the blueprint into its own folder; 0.3 writes
+down what the first four systems actually do: README diagram, optional video, maintenance prompts)
 
 ## 1. What counts as a "system"
 
@@ -47,9 +48,11 @@ point of the method.
 
 ### prax.yaml — the manifest
 Machine-readable front page. Tools (the checker, a future catalogue site, a model rebuilding the
-repo) start here. Fields: `prax`, `name`, `kind: system`, `one_liner`, `status`, `components`,
-`contracts`, `run.demo`, `run.tests`, `docs`, `explainer`, `built_with`. See
-[templates/prax.yaml](templates/prax.yaml).
+repo) start here. Required: `prax`, `name`, `kind: system`, `one_liner`, `status`, `run` (`demo`,
+`tests`), `docs`, `explainer`. Usual: `components`, `contracts` (`provides`, `depends_on`),
+`built_with` (`model`, `date`, `language`). Optional, as the systems needed them: `run.install`,
+`run.live`, `run.offline`, `explainer.video`, `built_with.demo_data_model`, extra `docs` entries.
+See [templates/prax.yaml](templates/prax.yaml).
 
 ### GOAL.md — intent
 Problem (one paragraph a stranger understands), who it is for, what success looks like (3–5
@@ -89,6 +92,10 @@ tests; rebuild the system in `<language>`") and **P-VERIFY** ("run the acceptanc
 demo against the rebuild and report every R-id that fails"). The prompts are written for a
 *future, more capable* model: say what, not how, unless the how is a contract.
 
+Later work is appended, not rewritten: a maintenance pass or a new feature becomes a new dated
+prompt (`P-08 · Maintenance pass (2026-11-13)`) that names the R-ids it added or changed. The list
+stays the honest history of how the repo was built, and P-REBUILD is updated to cover the new R-ids.
+
 ### ROADMAP.md — direction
 Milestones `M1…` with status (✅ done · 🔜 in progress · ⏳ planned · 💤 parked), each listing the
 R-ids it delivers, plus a "Next" section and "Ideas, not commitments".
@@ -100,8 +107,8 @@ decided. Includes decisions the user delegated ("decided autonomously overnight;
 ### demo/ — proof you can watch
 - `demo/data/` — **recorded** output committed to the repo (e.g. a small SQLite log of a demo
   team's day), so a clone shows something meaningful with **zero setup and no API key**;
-- `demo/generate.*` — a script that produces fresh live traffic (needs a key or runs against a
-  fake upstream);
+- a script that produces fresh live traffic (needs a key, or runs against a fake upstream); its
+  command goes in `prax.yaml` as `run.live`;
 - `demo/DEMO.md` — a 5-minute walkthrough: commands, what you should see, what to click.
 
 ### explainers/ — the story
@@ -115,7 +122,19 @@ from `file://`) that animates, in order:
 4. **Try it / replicate it** (the exact commands, and how to build your own variant).
 
 It respects `prefers-reduced-motion` and works in light and dark. It is also published as a
-claude.ai artifact; the link goes in README and `prax.yaml`.
+claude.ai artifact; the link goes in README and `prax.yaml`. The checker refuses a Silver explainer
+that loads any script, style or image from the network.
+
+Two smaller visuals sit beside it:
+
+- `explainers/readme-flow.svg` — one animated SVG (CSS or SMIL, no script, so GitHub renders it)
+  at the top of the README: the system's parts and one request moving through them.
+- optionally a **short video** (about a minute, silent, captioned) built from real screenshots and
+  real demo data, for people who will not click through an explainer. Commit the MP4 and its
+  source (e.g. a Remotion project in `explainers/video/`) so the video, too, can be re-rendered
+  when the system changes. Link it from README and as `explainer.video`.
+
+See [templates/EXPLAINER_GUIDE.md](templates/EXPLAINER_GUIDE.md).
 
 ### tests/ — the proof you can run
 Acceptance tests named or tagged with the R-ids they prove (`test_R004_logs_every_call`, or a
@@ -172,13 +191,21 @@ session-console), the shared surface is a set of **contracts** with one *owner* 
 |---|---|---|
 | `K-openai-chat@1` — OpenAI-compatible `/v1/chat/completions` | (external standard) | all |
 | `K-agent-headers@1` — `X-Agent-User`, `X-Agent-Id`, `X-Session-Id`, `X-Agent-Dept`… | llm-proxy-log | firewall, motors-sim, console |
-| `K-log-schema@1` — SQLite tables `calls` (+ `signals`, `admin_actions` in @2) | llm-proxy-log (@1), llm-proxy-firewall (@2) | session-console |
+| `K-log-schema@1` — SQLite tables `calls` (+ `signals`, `admin_actions` in @2) | llm-proxy-log (@1), llm-proxy-firewall (@2) | firewall, motors-sim, console |
+| `K-firewall-rules@1` — the YAML topics file | llm-proxy-firewall | motors-sim |
 
-The owner's SPEC.md defines the contract in full. Each consumer's SPEC.md has a **"Contracts we
+The current registry is [ecosystem/CONTRACTS.md](ecosystem/CONTRACTS.md). The owner's SPEC.md
+defines the contract in full. Each consumer's SPEC.md has a **"Contracts we
 depend on"** section naming the id and version and copying the minimum it relies on. A consumer's
 tests include a fixture produced by the owner (e.g. a demo SQLite file), so a broken contract fails
 the build of the consumer. This is how independent repos can be recombined later without a monster
 monorepo.
+
+When a repo needs another repo's code, it **copies** it (llm-proxy-firewall began as a copy of
+llm-proxy-log; vxc-motors-sim vendors the firewall proxy) and keeps its own tests, instead of
+depending on a shared package. Each repo stays clonable and runnable alone; the contract version is
+what says two copies still agree. The checker is vendored the same way: copy the latest
+`tools/prax_check.py` from prax-systems when you touch a repo.
 
 ## 7. Rebuilding with a future model
 
@@ -200,7 +227,8 @@ order.
 | Level | Means | Checker |
 |---|---|---|
 | **Bronze** | All required files exist; GOAL/SPEC/PROMPTS non-empty; README quickstart | `prax_check.py` exits 0 |
-| **Silver** | Bronze + every R-id cited by at least one test or `manual:` note; demo data present; explainer present | `prax_check.py --level silver` |
+| **Silver** | Bronze + every R-id cited by at least one test or `manual:` note; demo data present; offline explainer present | `prax_check.py --level silver` |
 | **Gold** | Silver + P-REBUILD has been replayed once by a different model or language and the result passed P-VERIFY; logged in DECISIONS | manual, recorded |
 
-Target for the first public release of each repo: **Silver**.
+Target for the first public release of each repo: **Silver**. All four systems built so far pass
+it ([recorded](demo/data/check_ecosystem.txt)); none is Gold yet.

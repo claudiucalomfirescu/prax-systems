@@ -1,5 +1,8 @@
 # Master plan · splitting agent-session-inspector into a Prax Systems ecosystem
 
+> **Historical snapshot**, kept for the record: the plan used to split agent-session-inspector into five repos (2026-10-30). Numbers and statuses below are as of that date.
+> For the current state of the ecosystem see [ecosystem/README.md](../README.md).
+
 Started 2026-10-30 21:12 UTC, built autonomously overnight; review on 2026-10-31.
 
 ## The goal (user's brief, condensed)
@@ -18,8 +21,8 @@ in `repos/` on branch `split` of this repository.
 | 2 | [`llm-proxy-firewall`](https://github.com/claudiucalomfirescu/llm-proxy-firewall/blob/main/) | Standalone copy of repo 1 **plus** the session firewall: info/warning/block, intent check, proxy answers as the LLM on block, signals + admin_actions (K-log-schema@2); small dashboard with firewall view; demo team whose recorded day includes incidents | repo-2 thread | ✅ v0.1 Silver · 62 tests · [explainer](https://claude.ai/artifact/9B6TSTeeKKVG2z3yT3fYYN) |
 | 3 | [`vxc-motors-sim`](https://github.com/claudiucalomfirescu/vxc-motors-sim/blob/main/) | VXC Motors BMW dealership: 12 employees **are agents** whose only channel is the LLM; enterprise apps **are tools** backed by small real local HTTP + DuckDB services; email and chat are tool calls delivered into real mailboxes/channels other agents read next turn; judgment tools (BMW portal) backed by an agent through the proxy; doc of what is behind each tool | repo-3 thread | ✅ v0.1 Silver · 84 tests · [explainer](https://claude.ai/artifact/8wC8ce5VHxeCewFyGd2izD) · [off-site replay](https://claude.ai/artifact/633ekHw6p5L5KiCf6KzMRD) |
 | 4 | [`llm-session-console`](https://github.com/claudiucalomfirescu/llm-session-console/blob/main/) | Local web app over the log DB: drill-down global → user → day/week charts (messages, sessions, tokens) → sessions → messages → firewall events; one Three.js 3D "galaxy" view (users → sessions → messages, click to drill); works on @1 and @2 logs | repo-4 thread | ✅ v0.1 Silver · 26 tests · [explainer](https://claude.ai/artifact/PezDkCy9QLtZon76eJiGnT) |
-| — | [`CONTRACTS.md`](CONTRACTS.md) | Shared contracts between the repos, one owner each | this thread | ✅ v1 proposal |
-| — | [`PUBLISHING.md`](PUBLISHING.md) + [`tools/publish.sh`](tools/publish.sh) | How the user creates each GitHub repo and pushes each folder as a standalone repo | this thread | ✅ |
+| — | [`CONTRACTS.md`](../CONTRACTS.md) | Shared contracts between the repos, one owner each | this thread | ✅ v1 proposal |
+| — | [`PUBLISHING.md`](PUBLISHING.md) + [`tools/publish.sh`](https://github.com/claudiucalomfirescu/agent-session-inspector/blob/main/repos/tools/publish.sh) | How the user creates each GitHub repo and pushes each folder as a standalone repo | this thread | ✅ |
 | — | [`MORNING_REPORT.md`](MORNING_REPORT.md) | Status, decisions, links to every explainer, what needs the user | this thread | ✅ |
 
 Status key: ✅ done · 🔜 in progress · ⏳ planned.
@@ -50,7 +53,7 @@ flowchart LR
 - Each thread works in its own folder under `repos/` on its own branch off `split` and merges back
   into `split`. Folders do not import from each other or from the root project; code is **copied**
   from the root (`proxy/`, `llm/`, `console/`, `systems/`, `runner/`, `dashboard/`) and trimmed.
-- Shared surface = [`CONTRACTS.md`](CONTRACTS.md). Repo 4 tests against the demo DBs of repos 1 and 2.
+- Shared surface = [`CONTRACTS.md`](../CONTRACTS.md). Repo 4 tests against the demo DBs of repos 1 and 2.
 
 ## Build order and dependencies
 1. `prax-systems` v0 + CONTRACTS (this thread, first) → everyone reads it.

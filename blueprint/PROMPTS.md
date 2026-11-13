@@ -12,20 +12,26 @@ Produce:
    Proof/tests+demo, Recipe/PROMPTS, Shape/ARCHITECTURE, Rendering/code) plus DECISIONS, ROADMAP,
    explainers; the exact content of each required file; the 6-step workflow
    (Frame, Spec, Prove, Render, Show, Seal); the 8 rules (incl. "publish the blueprint"); ecosystems with versioned contracts and
-   one owner each; how to rebuild with a future model; Bronze/Silver/Gold levels. Under 400 lines.
-2. templates/ (blueprint files under templates/blueprint/) with one template per file in K-prax-repo@0.2 plus DEMO.md and EXPLAINER_GUIDE.md.
+   one owner each, code copied between repos rather than imported; how to rebuild with a future
+   model; Bronze/Silver/Gold levels; the README diagram, the optional short video and dated
+   maintenance prompts. Under 400 lines.
+2. templates/ laid out like a repo (blueprint files under templates/blueprint/, demo/DEMO.md) with
+   one template per file in K-prax-repo@0.2, plus EXPLAINER_GUIDE.md.
 3. tools/prax_check.py in <LANGUAGE, default Python stdlib only> implementing R-001…R-013.
 4. examples/minimal: the smallest repo that passes --level silver.
 5. tests/ proving each R-id, named test_R0xx.
-6. explainers/index.html: a self-contained animated explainer (see templates/EXPLAINER_GUIDE.md).
+6. demo/check_ecosystem.sh (R-014) and its recorded output in demo/data/.
+7. ecosystem/CONTRACTS.md: a registry of the shared contracts, each linking to its owner's SPEC.
+8. explainers/index.html: a self-contained animated explainer (see templates/EXPLAINER_GUIDE.md),
+   and explainers/readme-flow.svg for the top of the README.
 Keep K-prax-repo@0.2 and K-prax-manifest@0.1 exactly as in SPEC.md.
 ```
 
 ## P-VERIFY
 ```text
-Run `python3 -m unittest discover -s tests` and `python3 tools/prax_check.py examples/minimal
---level silver`. Then run the checker on every sibling repo and list each R-id in SPEC.md with
-pass/fail/manual and evidence. Do not edit SPEC.md to make something pass.
+Run `python3 -m unittest discover -s tests`, `python3 tools/prax_check.py examples/minimal
+--level silver` and `./demo/check_ecosystem.sh` (the checker on every sibling repo). List each R-id
+in SPEC.md with pass/fail/manual and evidence. Do not edit SPEC.md to make something pass.
 ```
 
 ## Step-by-step prompts (as actually used, 2026-10-30)
@@ -100,4 +106,23 @@ checker: require the six files in blueprint/, report any left in the root, and r
 to point to blueprint/. Near the top of every README add a short callout: this repo publishes the
 blueprint (goal, spec, decisions, prompts), not only the code, so a more capable future model can
 regenerate it from scratch and prove the result with the same tests and demo data.
+```
+
+### P-07 · Write the method down from practice (2026-11-13)
+- **Delivers:** method 0.3, SPEC 0.3, R-007 (now tested), R-008 (registry), R-014, D-010…D-014
+- **Read first:** the four sibling repos (prax.yaml, blueprint/, explainers/, demo/), METHOD.md, SPEC.md
+- **Done when:** tests pass, this repo and all four siblings pass Silver, the video renders
+
+```text
+The four systems built with Prax Systems have been in use for two weeks. Compare what they actually
+do with what METHOD.md and SPEC.md say, and change the method, not the systems: document what they
+all do (an animated readme-flow.svg at the top of the README; an optional short video with its
+source committed; maintenance passes appended to PROMPTS.md as dated prompts; optional manifest keys
+such as run.live and explainer.video; code copied between repos, not imported). Do not add rules
+nobody follows. Simplify the checker without changing its verdicts, and turn R-007 into a test (no
+script, style, font or image loaded from the network). Replace the copied contract definitions in
+ecosystem/ with a registry that links to each owner's SPEC, and move the dated split documents to
+ecosystem/history/. Add demo/check_ecosystem.sh that runs Silver on every published sibling, and
+record its output. Fix stale statements (license, roadmap status, paths). Make a ~60 s explainer
+video from the method's own diagrams and the recorded checker results, source in explainers/video/.
 ```
